@@ -1,16 +1,33 @@
-@tailwind base;
+/* @tailwind base;
 @tailwind components;
-@tailwind utilities;
+@tailwind utilities; */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  --primary-background: #171717;
+  --primary-foreground: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    /* --background: #0a0a0a;
+    --foreground: #ededed; */
+    --background: #ffffff;
+    --foreground: #171717;
+
+    --primary-background: #171717;
+    --primary-foreground: #ffffff;
+
+    --secondary-background: #464646;
+    --secondary-foreground: #ffffff;
   }
 }
 
@@ -20,13 +37,77 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+.root-container {
+  @apply flex flex-row w-screen h-screen;
+}
 
-  .wi {
-    color: var(--background);
-    background-color: var(--foreground);
-  }
+.root-content {
+  @apply flex flex-col w-full h-full;
+}
+
+.wi-primary-colors {
+  color: var(--primary-foreground);
+  background-color: var(--primary-background);
+}
+
+.wi-secondary-colors {
+  color: var(--secondary-foreground);
+  background-color: var(--secondary-background);
+}
+
+.prose-editor {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.prose-editor h1, .prose-editor h2, .prose-editor h3, .prose-editor h4, .prose-editor h5, .prose-editor h6 {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.prose-editor p {
+  margin-bottom: 1.5rem;
+}
+
+.prose-editor blockquote {
+  border-left: 4px solid #ddd;
+  padding-left: 1rem;
+  margin: 1.5rem 0;
+  font-style: italic;
+}
+
+.prose-editor ul, .prose-editor ol {
+  margin-bottom: 1.5rem;
+}
+
+.prose-editor ul, ol {
+  padding-left: 0;
+  margin-left: 0;
+  list-style-position: inside;
+}
+
+.prose-editor ul li, ol li {
+  position: relative;
+  padding-left: 2rem;
+}
+
+.prose-editor ul li::before, ol li::before {
+  position: absolute;
+  left: 0;
+}
+
+.prose-editor pre {
+  background-color: #f5f5f5;
+  padding: 1rem;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+
+.prose-editor a {
+  color: #1a0dab;
+  text-decoration: none;
+}
+
+.prose-editor a:hover {
+  text-decoration: underline;
 }

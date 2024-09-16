@@ -1,0 +1,15 @@
+.spine {
+    @apply flex flex-col w-[45px] border-0 border-r border-gray-100 border-solid;
+
+    &-head {
+        @apply flex flex-col;
+    }
+
+    &-middle {
+        @apply flex-1 flex flex-col justify-center;
+    }
+
+    &-foot {
+        @apply flex flex-col;
+    }
+}

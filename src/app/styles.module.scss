@@ -1,0 +1,7 @@
+.container {
+    @apply flex flex-row;
+
+    .left-side {
+        @apply w-[320px] h-screen shrink-0;
+    }
+}
