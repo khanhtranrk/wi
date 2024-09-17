@@ -2,6 +2,7 @@
 
 import { TableOfContentItem, ITableOfContentItem } from './TableOfContentItem';
 import styles from './TableOfContent.module.scss';
+import { TfiPlus } from "react-icons/tfi";
 
 // Props
 
@@ -20,7 +21,17 @@ export function TableOfContent({
 }: Readonly<TableOfContentProps>) {
   return (
     <div className={`${styles['table-of-content']} ${className}`} {...props}>
-      {data.map((item) => <TableOfContentItem data={item} onClick={onItemClick} />)}
+      <div className={`${styles['top']}`}>
+        <div style={{display: 'flex', flex: 1, justifyContent: 'center', alignItems: 'center', fontWeight: 'bold'}}>
+          Notebook 1
+        </div>
+        <button className={`${styles['add-button']}`}>
+          <TfiPlus height={32} width={32}/>
+        </button>
+      </div>
+      <div className={`${styles['table']}`}>
+        {data.map((item) => <TableOfContentItem data={item} onClick={onItemClick} />)}
+      </div>
     </div>
   );
 }

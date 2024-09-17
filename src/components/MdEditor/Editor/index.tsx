@@ -22,7 +22,8 @@ import {
   AdmonitionDirectiveDescriptor,
   type MDXEditorMethods,
 } from '@mdxeditor/editor'
-import '@mdxeditor/editor/style.css'
+import '@mdxeditor/editor/style.css';
+import './styles.css';
 import styles from './styles.module.scss';
 
 interface EditorProps {

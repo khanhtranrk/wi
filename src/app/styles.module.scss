@@ -1,5 +1,5 @@
 .container {
-    @apply flex flex-row;
+    @apply flex flex-row overflow-hidden;
 
     .left-side {
         @apply w-[320px] h-screen shrink-0;

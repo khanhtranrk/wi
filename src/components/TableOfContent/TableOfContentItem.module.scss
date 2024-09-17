@@ -1,3 +1,31 @@
 .table-of-content-item {
-    @apply flex flex-col border border-gray-100 border-solid p-2 gap-1;
+    display: flex;
+    flex-direction: column;
+    padding: 4px 0px 0px 0px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    gap: 2;
+    @apply rounded-lg;
+
+    .title {
+        flex: 1;
+        vertical-align: middle;
+    }
+
+    .content {
+        will-change: transform, opacity, height;
+        margin-left: 6px;
+        padding: 0px 0px 0px 14px;
+        overflow: hidden;
+    }
+
+    .toggle {
+        width: 1em;
+        height: 1em;
+        margin-right: 10;
+        cursor: pointer;
+        vertical-align: middle;
+    }
 }

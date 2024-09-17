@@ -1,3 +1,36 @@
 .table-of-content {
-    @apply flex flex-col border-0 border-r border-gray-100 border-solid p-2 gap-4 overflow-y-auto;
+    @apply flex flex-col border-0 border-r border-gray-100 border-solid gap-1;
+
+    .top {
+        @apply flex flex-row h-11;
+
+        .add-button {
+            @apply w-11 h-11 flex justify-center items-center border-none outline-none bg-transparent;
+            @apply hover:bg-gray-100;
+        }
+    }
+
+    .table {
+        @apply flex flex-col gap-1 pl-2 pr-2 overflow-y-auto;
+    }
+
+    .contextMenu {
+        position: absolute;
+        background-color: white;
+        border: 1px solid #ccc;
+        box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        list-style: none;
+        padding: 5px 0;
+        margin: 0;
+    }
+
+    .contextMenu li {
+        padding: 8px 12px;
+        cursor: pointer;
+    }
+
+    .contextMenu li:hover {
+        background-color: #f0f0f0;
+    }
 }
