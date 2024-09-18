@@ -34,7 +34,7 @@ interface EditorProps {
 const MdEditor: FC<EditorProps> = ({ markdown, editorRef }) => {
   return (
     <MDXEditor
-      className={styles['editor']}
+      className={styles.editor}
       contentEditableClassName='prose-editor'
       plugins={[
         listsPlugin(),

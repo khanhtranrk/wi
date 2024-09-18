@@ -42,15 +42,10 @@ body {
 }
 
 .root-content {
-  @apply flex flex-col w-full h-full;
+  @apply flex w-full h-full;
 }
 
-.wi-primary-colors {
-  color: var(--primary-foreground);
-  background-color: var(--primary-background);
-}
-
-.wi-secondary-colors {
-  color: var(--secondary-foreground);
-  background-color: var(--secondary-background);
+.root-navigation {
+  @apply flex w-[45px] flex-shrink-0;
+  @apply border-0 border-r border-gray-100 border-solid;
 }

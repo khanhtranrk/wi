@@ -29,8 +29,9 @@ export default function RootLayout({
       <body
         className={`root-container ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Spine
-        />
+        <div className="root-navigation">
+          <Spine />
+        </div>
         <div className="root-content">
           {children}
         </div>

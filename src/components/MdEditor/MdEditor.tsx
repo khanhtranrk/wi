@@ -7,8 +7,7 @@ export interface MdEditorProps {
 }
 
 export function MdEditor({
-    markdown,
-    ...props
+    markdown
 }: Readonly<MdEditorProps>) {
   return (
     <Editor markdown={markdown} />

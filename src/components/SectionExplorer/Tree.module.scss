@@ -1,0 +1,46 @@
+.tree {
+    @apply flex flex-col text-ellipsis whitespace-nowrap align-middle cursor-pointer rounded-lg;
+    @apply overflow-hidden;
+
+    .node {
+        @apply flex flex-col;
+
+        .display {
+            @apply flex flex-row gap-2;
+
+            .title {
+                @apply flex flex-1 flex-col justify-center p-4;
+            }
+
+            .moreButton {
+                @apply flex items-center justify-center w-10 shrink-0 p-2;
+                @apply border-none outline-none bg-transparent hover:text-blue-500;
+            }
+        }
+
+        .menu {
+            @apply flex;
+            @apply overflow-hidden;
+            will-change: transform, opacity, height;
+
+            &Content {
+                @apply flex-1 flex flex-row-reverse;
+
+                .optionButton {
+                    @apply flex items-center justify-center w-10 shrink-0 p-2;
+                    @apply border-none outline-none bg-transparent hover:text-blue-500;
+                }
+            }
+
+        }
+    }
+
+    .content {
+        @apply overflow-hidden;
+        will-change: transform, opacity, height;
+    }
+
+    .toggle {
+        @apply w-4 h-4 mr-2 cursor-pointer align-middle;
+    }
+}
