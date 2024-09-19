@@ -1,4 +1,8 @@
+'use client'
+
+import React from 'react';
 import styles from './SpineItem.module.scss';
+import { useRouter } from 'next/navigation'
 
 // interface
 
@@ -6,7 +10,7 @@ export interface ISpineItem {
     name: string;
     displayName: string;
     link: string;
-    icon: string;
+    icon: React.ReactNode;
 }
 
 // Props
@@ -23,12 +27,12 @@ export function SpineItem({
   ...props
 }: Readonly<SpineItemProps>) {
   className = className || '';
+  const router = useRouter();
   return (
-    <div className={`${styles['spine-item']} ${className}`} key={data.name} {...props}>
-      {/* <a href={data.link} className='spine-link'>
-        <img src={data.icon} className='spine-icon' />
-        <span className='spine-text'>{data.displayName}</span>
-      </a> */}
+    <div key={data.name} className={`${styles['spine-item']} ${className}`} onClick={() => router.push(data.link)} {...props}>
+      <div className='spine-icon'>
+        {data.icon}
+      </div>
     </div>
   );
 }

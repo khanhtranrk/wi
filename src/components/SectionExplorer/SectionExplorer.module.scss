@@ -2,6 +2,56 @@
     @apply flex-1 flex flex-col gap-1;
     @apply overflow-hidden;
 
+    .actionPopup {
+        @apply flex;
+        @apply overflow-hidden;
+        @apply bg-yellow-200 rounded-lg;
+        will-change: transform, opacity, height;
+
+        &Content {
+            @apply flex-1 flex flex-col p-2;
+            @apply gap-2;
+
+            &Inputs {
+                @apply flex flex-row gap-2 h-8;
+
+                input[type="text"] {
+                    @apply flex-1 p-2 outline-none border-none bg-[#f0f0f044] rounded-lg text-white;
+                }
+
+                input[type="color"] {
+                    appearance: none;
+                    -webkit-appearance: none;
+                    @apply outline-none border-none h-8 w-8 p-0 rounded-full;
+                }
+
+                input[type="color"]::-webkit-color-swatch-wrapper {
+                    padding: 0; 
+                }
+
+                input[type="color"]::-webkit-color-swatch {
+                    border: none;
+                    border-radius: 50%;
+                }
+
+                p {
+                    @apply flex-1 flex items-center p-2;
+                    @apply border-none outline-none bg-[#f0f0f044] rounded-lg text-red-400 text-xs font-bold;
+                }
+            }
+
+            &Buttons {
+                @apply flex flex-row h-8;
+
+                button {
+                    @apply flex-1 flex items-center justify-center w-10 shrink-0 p-2;
+                    @apply border-none outline-none bg-transparent hover:text-blue-500;
+                }
+            }
+        }
+
+    }
+
     .trees {
         @apply flex-1 flex flex-col gap-1;
         @apply p-2 overflow-y-auto;

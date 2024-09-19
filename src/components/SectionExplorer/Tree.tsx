@@ -1,19 +1,19 @@
 'use client'
 
 import { useEffect, useState, MouseEvent } from 'react';
-import styles from './Tree.module.scss';
-import useMeasure from 'react-use-measure'
 import { useSpring, animated, a } from '@react-spring/web';
 import { LuMoreHorizontal, LuPen, LuPlus, LuTrash } from 'react-icons/lu';
+import useMeasure from 'react-use-measure'
+import styles from './Tree.module.scss';
 
 // Interface
 
 export interface ITree<T = any> {
-  key: string;
+  key?: string;
   title: string;
-  data?: T;
   color?: string;
   childrens?: ITree[];
+  data?: T;
 }
 
 
@@ -21,22 +21,23 @@ export interface ITree<T = any> {
 
 export interface TreeProps<T = any> extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onClick'> {
   data: ITree<T>;
-  onClick?: (data: ITree<T>, event: React.MouseEvent<HTMLDivElement>) => void;
+  onClick?: (node: ITree<T>, event: React.MouseEvent<HTMLDivElement>) => void;
+  onCreate?: (parentNode: ITree<T>, node: ITree<T>) => void;
 }
 
 // Component
 
-export function Tree({
+export function Tree<T = any>({
   data,
   className,
-  onClick,
-  ...props
-}: Readonly<TreeProps>) {
+  onClick
+}: Readonly<TreeProps<T>>) {
   className = className || '';
 
-  const [tree, setTree] = useState(data);
-  const [isOpen, setOpen] = useState(false);
-  const [isMenuOpen, setMenuOpen] = useState(false);
+  const [tree, setTree] = useState<ITree>(data);
+  const [isOpen, setOpen] = useState<boolean>(false);
+  const [isMenuOpen, setMenuOpen] = useState<boolean>(false);
+  const [isActionPopupOpen, setActionPopupOpen] = useState<0 | 1 | 2 | 3>(0); // 0: close | 1: create | 2: edit | 3: delete
   const [ref, { height: viewHeight }] = useMeasure();
 
   const contentAnimation = useSpring({
@@ -57,12 +58,22 @@ export function Tree({
     },
   });
 
+  const actionPopupAnimation = useSpring({
+    from: { height: 0, opacity: 0, y: 0 },
+    to: {
+      height: isActionPopupOpen ? 88 : 0,
+      opacity: isActionPopupOpen ? 1 : 0,
+      y: isActionPopupOpen ? 0 : -40,
+    },
+  });
+
   useEffect(() => {
     setTree(data);
   }, [data]);
 
   function handleClick(event: MouseEvent<HTMLDivElement>) {
     setMenuOpen(false)
+    setActionPopupOpen(0)
     setOpen(!isOpen)
 
     if (onClick) {
@@ -70,14 +81,29 @@ export function Tree({
     }
   }
 
-  function handleMenuClick(event: MouseEvent<HTMLButtonElement>) {
+  function handleMenuClick() {
     setOpen(false)
+    setActionPopupOpen(0)
     setMenuOpen(!isMenuOpen)
   };
 
   function handleContextMenu(event: MouseEvent<HTMLDivElement>) {
     event.preventDefault();
+    setOpen(false)
+    setActionPopupOpen(0)
     setMenuOpen(!isMenuOpen)
+  }
+
+  function handleActionPopupClick(action: 0 | 1 | 2 | 3) {
+    setMenuOpen(false)
+    setOpen(action === 1)
+    setActionPopupOpen(action === isActionPopupOpen ? 0 : action)
+  }
+
+  function handleActionPopupCancelclick() {
+    setOpen(false)
+    setMenuOpen(false)
+    setActionPopupOpen(0)
   }
 
   return (
@@ -89,9 +115,10 @@ export function Tree({
             <p>{tree.title}</p>
           </div>
           <button className={styles.moreButton} onClick={handleMenuClick}>
-            <LuMoreHorizontal height={24} width={24} />
+            <LuMoreHorizontal size={14} />
           </button>
         </div>
+
         <animated.div
           className={styles.menu}
           style={{
@@ -99,17 +126,53 @@ export function Tree({
             height: menuAnimation.height,
           }}>
             <a.div className={styles.menuContent} style={{ y: menuAnimation.y }}>
-              <button className={styles.optionButton}>
-                <LuPlus height={24} width={24} />
+              <button className={styles.optionButton} onClick={() => handleActionPopupClick(1)}>
+                <LuPlus size={14} />
               </button>
-              <button className={styles.optionButton}>
-                <LuPen height={24} width={24} />
+              <button className={styles.optionButton} onClick={() => handleActionPopupClick(2)}>
+                <LuPen size={14} />
               </button>
-              <button className={styles.optionButton}>
-                <LuTrash height={24} width={24} />
+              <button className={styles.optionButton} onClick={() => handleActionPopupClick(3)}>
+                <LuTrash size={14} />
               </button>
             </a.div>
         </animated.div>
+
+        <animated.div
+          className={styles.actionPopup}
+          style={{
+            opacity: actionPopupAnimation.opacity,
+            height: actionPopupAnimation.height,
+          }}>
+            <a.div className={styles.actionPopupContent} style={{ y: actionPopupAnimation.y }}>
+              <div className={styles.actionPopupContentInputs}>
+                {(isActionPopupOpen === 1 || isActionPopupOpen === 2) && (
+                  <>
+                    <input type="text" value={isActionPopupOpen === 1 ? '' : tree.title}/>
+                    <input type="color" value={isActionPopupOpen === 1 ? '#fde68a' : (tree.color || '#000000')} />
+                  </>
+                )}
+                {(isActionPopupOpen === 3) && (
+                  <p>Do you want to delete it?</p>
+                )}
+              </div>
+              <div className={styles.actionPopupContentButtons}>
+                {(isActionPopupOpen === 1 || isActionPopupOpen === 2) && (
+                  <>
+                    <button onClick={handleActionPopupCancelclick}>Cancel</button>
+                    <button>Save</button>
+                  </>
+                )}
+                {(isActionPopupOpen === 3) && (
+                  <>
+                    <button onClick={handleActionPopupCancelclick}>No</button>
+                    <button>Yes</button>
+                  </>
+                )}
+              </div>
+            </a.div>
+        </animated.div>
+
       </div>
 
       {tree.childrens && tree.childrens.length > 0 && (

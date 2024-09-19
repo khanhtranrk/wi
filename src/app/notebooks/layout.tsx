@@ -1,8 +1,10 @@
 'use client'
 
+import { useEffect, useState, MouseEvent } from 'react';
+import { useRouter } from 'next/navigation';
 import { SectionExplorer, ITree } from '@/components';
 import styles from './styles.module.scss';
-import { useEffect, useState } from 'react';
+import { LuPlus } from 'react-icons/lu';
 
 // Data
 
@@ -163,7 +165,9 @@ export default function Notebooks({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const router = useRouter()
   const [pages, setPages] = useState(tableOfContent);
+  const [isActionPopupOpen, setActionPopupOpen] = useState<0 | 1>(0); // 0: close | 1: create
 
   useEffect(() => {
     console.log("begin | it changed");
@@ -171,24 +175,27 @@ export default function Notebooks({
     console.log("end   | it changed");
   }, [pages]);
 
+  function handleSectionExplorerItemClick(node: ITree, event: MouseEvent<HTMLDivElement>) {
+    router.push(`/notebooks/1/pages/${node.key}`)
+  }
+
   return (
     <div className={styles.notebooks}>
       <div className={styles.leftSide}>
         <div className={styles.topBar}>
           <button style={{height: 44, width: 44}} onClick={() => {
-            setPages([...pages, {
-              key: 'New Note',
-              title: 'New Note',
-              color: 'rgb(254 240 138)',
-              childrens: [],
-            }]);
-          }}>+</button>
-          <button style={{height: 44, width: 44}} onClick={() => {
-            console.log(pages);
-          }}>v</button>
+            setActionPopupOpen(isActionPopupOpen === 1 ? 0 : 1);
+          }}>
+            <LuPlus size={24} />
+          </button>
         </div>
         <div className={styles.explorer}>
-          <SectionExplorer data={pages} />
+          <SectionExplorer
+            data={pages}
+            onItemClick={handleSectionExplorerItemClick}
+            actionPopup={isActionPopupOpen}
+            onActionPopupChanged={(action) => setActionPopupOpen(action)}
+          />
         </div>
       </div>
       <div className={styles.rightSide}>

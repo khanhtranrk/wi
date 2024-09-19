@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { Spine } from "@/components";
+import { ISpineItem, Spine } from "@/components";
+import { LuHome, LuListTodo, LuStickyNote } from "react-icons/lu";
+import StoreProvider from "./StoreProvider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -13,6 +15,21 @@ const geistMono = localFont({
   variable: "--font-geist-mono",
   weight: "100 900",
 });
+
+const spineItems: ISpineItem[] = [
+  {
+    name: "Notebooks",
+    displayName: "Notebooks",
+    link: "/notebooks",
+    icon: <LuStickyNote size={18} />,
+  },
+  {
+    name: "Todos",
+    displayName: "Todos",
+    link: "/todos",
+    icon: <LuListTodo size={18} />,
+  }
+];
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -30,10 +47,12 @@ export default function RootLayout({
         className={`root-container ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <div className="root-navigation">
-          <Spine />
+          <Spine middleItems={spineItems}/>
         </div>
         <div className="root-content">
-          {children}
+          <StoreProvider>
+            {children}
+          </StoreProvider>
         </div>
       </body>
     </html>

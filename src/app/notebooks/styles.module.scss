@@ -6,8 +6,13 @@
         @apply border-0 border-r border-gray-100 border-solid;
 
         .topBar {
-            @apply flex flex-row shrink-0;
+            @apply flex flex-row-reverse shrink-0;
             @apply h-11;
+
+            button {
+                @apply flex items-center justify-center w-11 shrink-0 p-2;
+                @apply border-none outline-none bg-transparent hover:text-blue-500;
+            }
         }
 
         .explorer {
