@@ -1,8 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit'
+import notebooksSlide from '@/lib/features/notebooks/notebookSlice'
 
 export const makeStore = () => {
   return configureStore({
-    reducer: {}
+    reducer: {
+      notebooks: notebooksSlide
+    }
   })
 }
 

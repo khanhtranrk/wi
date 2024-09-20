@@ -1,118 +1,161 @@
 'use client'
 
-import { useEffect, useState, MouseEvent } from 'react';
+import { useEffect, useState, MouseEvent, useMemo } from 'react';
 import { useSpring, animated, a } from '@react-spring/web';
-import { LuMoreHorizontal, LuPen, LuPlus, LuTrash } from 'react-icons/lu';
+import { LuLayoutList, LuMoreHorizontal, LuPen, LuPlus, LuTrash } from 'react-icons/lu';
 import useMeasure from 'react-use-measure'
 import styles from './Tree.module.scss';
-
-// Interface
-
-export interface ITree<T = any> {
-  key?: string;
-  title: string;
-  color?: string;
-  childrens?: ITree[];
-  data?: T;
-}
-
+import { ESectionExplorerAction, ISectionExplorerNode, ISectionExplorerTree } from './types';
 
 // Props
 
 export interface TreeProps<T = any> extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onClick'> {
-  data: ITree<T>;
-  onClick?: (node: ITree<T>, event: React.MouseEvent<HTMLDivElement>) => void;
-  onCreate?: (parentNode: ITree<T>, node: ITree<T>) => void;
+  head: ISectionExplorerNode<T>;
+  data: ISectionExplorerTree<T>[];
+  onChanged?: (node: ISectionExplorerNode) => void;
+  onAction?: (node: ISectionExplorerNode, action: ESectionExplorerAction) => void;
 }
 
 // Component
 
 export function Tree<T = any>({
+  head,
   data,
+  onChanged,
+  onAction,
   className,
-  onClick
 }: Readonly<TreeProps<T>>) {
   className = className || '';
 
-  const [tree, setTree] = useState<ITree>(data);
-  const [isOpen, setOpen] = useState<boolean>(false);
-  const [isMenuOpen, setMenuOpen] = useState<boolean>(false);
-  const [isActionPopupOpen, setActionPopupOpen] = useState<0 | 1 | 2 | 3>(0); // 0: close | 1: create | 2: edit | 3: delete
-  const [ref, { height: viewHeight }] = useMeasure();
+  const [node, setNode] = useState<ISectionExplorerTree>(head);
+  const [trees, setTrees] = useState<ISectionExplorerTree[]>(data);
 
+  const [ref, { height: viewHeight }] = useMeasure();
   const contentAnimation = useSpring({
     from: { height: 0, opacity: 0, y: 0 },
     to: {
-      height: isOpen ? viewHeight : 0,
-      opacity: isOpen ? 1 : 0,
-      y: isOpen ? 0 : -40,
+      height: node.isExpanded ? viewHeight : 0,
+      opacity: node.isExpanded ? 1 : 0,
+      y: node.isExpanded ? 0 : -40,
     },
   });
-
   const menuAnimation = useSpring({
     from: { height: 0, opacity: 0, y: 0 },
     to: {
-      height: isMenuOpen ? 40 : 0,
-      opacity: isMenuOpen ? 1 : 0,
-      y: isMenuOpen ? 0 : -40,
+      height: node.isMenuOpen ? 40 : 0,
+      opacity: node.isMenuOpen ? 1 : 0,
+      y: node.isMenuOpen ? 0 : -40,
     },
   });
-
   const actionPopupAnimation = useSpring({
     from: { height: 0, opacity: 0, y: 0 },
     to: {
-      height: isActionPopupOpen ? 88 : 0,
-      opacity: isActionPopupOpen ? 1 : 0,
-      y: isActionPopupOpen ? 0 : -40,
+      height: node.isActionPopupOpen ? 88 : 0,
+      opacity: node.isActionPopupOpen ? 1 : 0,
+      y: node.isActionPopupOpen ? 0 : -40,
     },
   });
 
-  useEffect(() => {
-    setTree(data);
-  }, [data]);
+  function handleClick() {
+    setNode({
+      ...node,
+      isExpanded: !node.isExpanded,
+      isMenuOpen: false,
+      isActionPopupOpen: 0,
+    });
 
-  function handleClick(event: MouseEvent<HTMLDivElement>) {
-    setMenuOpen(false)
-    setActionPopupOpen(0)
-    setOpen(!isOpen)
-
-    if (onClick) {
-      onClick(data, event);
-    }
+    onChanged && onChanged({
+      ...node,
+      isExpanded: !node.isExpanded,
+      isMenuOpen: false,
+      isActionPopupOpen: 0,
+    });
   }
 
   function handleMenuClick() {
-    setOpen(false)
-    setActionPopupOpen(0)
-    setMenuOpen(!isMenuOpen)
+    setNode({
+      ...node,
+      isExpanded: false,
+      isMenuOpen: !node.isMenuOpen,
+      isActionPopupOpen: 0,
+    });
+
+    onChanged && onChanged({
+      ...node,
+      isExpanded: false,
+      isMenuOpen: !node.isMenuOpen,
+      isActionPopupOpen: 0,
+    });
   };
 
   function handleContextMenu(event: MouseEvent<HTMLDivElement>) {
     event.preventDefault();
-    setOpen(false)
-    setActionPopupOpen(0)
-    setMenuOpen(!isMenuOpen)
+    setNode({
+      ...node,
+      isExpanded: false,
+      isMenuOpen: !node.isMenuOpen,
+      isActionPopupOpen: 0,
+    });
+
+    onChanged && onChanged({
+      ...node,
+      isExpanded: false,
+      isMenuOpen: !node.isMenuOpen,
+      isActionPopupOpen: 0,
+    });
   }
 
-  function handleActionPopupClick(action: 0 | 1 | 2 | 3) {
-    setMenuOpen(false)
-    setOpen(action === 1)
-    setActionPopupOpen(action === isActionPopupOpen ? 0 : action)
+  function handleActionPopupClick(action: ESectionExplorerAction) {
+    setNode({
+      ...node,
+      isExpanded: action === 1,
+      isMenuOpen: false,
+      isActionPopupOpen: action === node.isActionPopupOpen ? 0 : action,
+    });
+
+    onChanged && onChanged({
+      ...node,
+      isExpanded: action === 1,
+      isMenuOpen: false,
+      isActionPopupOpen: action === node.isActionPopupOpen ? 0 : action,
+    });
   }
 
   function handleActionPopupCancelclick() {
-    setOpen(false)
-    setMenuOpen(false)
-    setActionPopupOpen(0)
+    setNode({
+      ...node,
+      isExpanded: false,
+      isMenuOpen: false,
+      isActionPopupOpen: 0,
+    });
+
+    onChanged && onChanged({
+      ...node,
+      isExpanded: false,
+      isMenuOpen: false,
+      isActionPopupOpen: 0,
+    });
   }
 
+  useEffect(() => {
+    setTrees(data);
+  }, [data]);
+
+  useEffect(() => {
+    setNode(head);
+  }, [head]);
+
+  const nodes = useMemo(() => {
+    return trees.filter((item) => item.parentNodeKey === node.key);
+  }, [trees, node]);
+
   return (
-    <div className={`${styles.tree} ${className}`} style={{backgroundColor: tree.color || 'transparent'}}>
+    <div className={`${styles.tree} ${className}`} style={{backgroundColor: node.color || 'transparent'}}>
 
       <div className={styles.node}>
         <div className={styles.display}>
           <div className={`${styles.title}`} onClick={handleClick} onContextMenu={handleContextMenu}>
-            <p>{tree.title}</p>
+            <p>{node.title}</p>
           </div>
           <button className={styles.moreButton} onClick={handleMenuClick}>
             <LuMoreHorizontal size={14} />
@@ -126,6 +169,9 @@ export function Tree<T = any>({
             height: menuAnimation.height,
           }}>
             <a.div className={styles.menuContent} style={{ y: menuAnimation.y }}>
+              <button className={styles.optionButton}>
+                <LuLayoutList size={14} onClick={() => onAction && onAction(node, ESectionExplorerAction.View)}/>
+              </button>
               <button className={styles.optionButton} onClick={() => handleActionPopupClick(1)}>
                 <LuPlus size={14} />
               </button>
@@ -146,24 +192,24 @@ export function Tree<T = any>({
           }}>
             <a.div className={styles.actionPopupContent} style={{ y: actionPopupAnimation.y }}>
               <div className={styles.actionPopupContentInputs}>
-                {(isActionPopupOpen === 1 || isActionPopupOpen === 2) && (
+                {(node.isActionPopupOpen === 1 || node.isActionPopupOpen === 2) && (
                   <>
-                    <input type="text" value={isActionPopupOpen === 1 ? '' : tree.title}/>
-                    <input type="color" value={isActionPopupOpen === 1 ? '#fde68a' : (tree.color || '#000000')} />
+                    <input type="text" value={node.isActionPopupOpen === 1 ? '' : node.title}/>
+                    <input type="color" value={node.isActionPopupOpen === 1 ? '#fde68a' : (node.color || '#000000')} />
                   </>
                 )}
-                {(isActionPopupOpen === 3) && (
+                {(node.isActionPopupOpen === 3) && (
                   <p>Do you want to delete it?</p>
                 )}
               </div>
               <div className={styles.actionPopupContentButtons}>
-                {(isActionPopupOpen === 1 || isActionPopupOpen === 2) && (
+                {(node.isActionPopupOpen === 1 || node.isActionPopupOpen === 2) && (
                   <>
                     <button onClick={handleActionPopupCancelclick}>Cancel</button>
                     <button>Save</button>
                   </>
                 )}
-                {(isActionPopupOpen === 3) && (
+                {(node.isActionPopupOpen === 3) && (
                   <>
                     <button onClick={handleActionPopupCancelclick}>No</button>
                     <button>Yes</button>
@@ -175,7 +221,7 @@ export function Tree<T = any>({
 
       </div>
 
-      {tree.childrens && tree.childrens.length > 0 && (
+      {nodes && nodes.length > 0 && (
         <animated.div
           className={styles.content}
           style={{
@@ -183,10 +229,12 @@ export function Tree<T = any>({
             height: contentAnimation.height,
           }}>
             <a.div ref={ref} style={{ y: contentAnimation.y }}>
-              {tree.childrens.map((item) => (
+              {nodes.map((item) => (
                 <Tree
-                  data={item}
-                  onClick={onClick}
+                  head={item}
+                  data={trees}
+                  onChanged={onChanged}
+                  onAction={onAction}
                 />
               ))}
             </a.div>

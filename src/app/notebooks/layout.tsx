@@ -2,163 +2,12 @@
 
 import { useEffect, useState, MouseEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { SectionExplorer, ITree } from '@/components';
+import { ESectionExplorerAction, SectionExplorer } from '@/components';
 import styles from './styles.module.scss';
 import { LuPlus } from 'react-icons/lu';
-
-// Data
-
-const tableOfContent: ITree[] = [
-  {
-    key: 'Daily Notes',
-    title: 'Daily Notes',
-    color: 'rgb(254 202 202)',
-    childrens: [
-      {
-        key: '19-09-2024',
-        title: '19-09-2024',
-        color: 'rgb(254 202 255)',
-        childrens: [
-          {
-            key: 'heading-3',
-            title: 'Heading 3',
-            color: 'rgb(254 202 255)',
-            childrens: [
-              {
-                key: 'heading-4',
-                title: 'Heading 4',
-                color: 'rgb(254 202 255)',
-                childrens: [],
-              },
-            ],
-          },
-        ],
-      },
-      {
-        key: '18-09-2024',
-        title: '18-09-2024',
-        childrens: [
-          {
-            key: 'heading-3',
-            title: 'Heading 3',
-            childrens: [
-              {
-                key: 'heading-4',
-                title: 'Heading 4',
-                childrens: [],
-              },
-            ],
-          },
-        ],
-      },
-      {
-        key: '17-09-2024',
-        title: '17-09-2024',
-        childrens: [
-          {
-            key: 'heading-3',
-            title: 'Heading 3',
-            childrens: [
-              {
-                key: 'heading-4',
-                title: 'Heading 4',
-                childrens: [],
-              },
-            ],
-          },
-        ],
-      },
-      {
-        key: '16-09-2024',
-        title: '16-09-2024',
-        childrens: [
-          {
-            key: 'heading-3',
-            title: 'Heading 3',
-            childrens: [
-              {
-                key: 'heading-4',
-                title: 'Heading 4',
-                childrens: [],
-              },
-            ],
-          },
-        ],
-      },
-      {
-        key: '15-09-2024',
-        title: '15-09-2024',
-        childrens: [
-          {
-            key: 'heading-3',
-            title: 'Heading 3',
-            childrens: [
-              {
-                key: 'heading-4',
-                title: 'Heading 4',
-                childrens: [],
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  },
-  {
-    key: 'Weekly Notes',
-    title: 'Weekly Notes',
-    color: 'rgb(254 215 170)',
-    childrens: [
-      {
-        key: 'heading-2',
-        title: 'Heading 2',
-        childrens: [
-          {
-            key: 'heading-3',
-            title: 'Heading 3',
-            childrens: [],
-          },
-        ],
-      },
-    ],
-  },
-  {
-    key: 'Monthly Notes',
-    title: 'Monthly Notes',
-    color: 'rgb(253 230 138)',
-    childrens: [
-      {
-        key: 'heading-2',
-        title: 'Heading 2',
-        childrens: [
-          {
-            key: 'heading-3',
-            title: 'Heading 3',
-            childrens: [],
-          },
-        ],
-      },
-    ],
-  },
-  {
-    key: 'Yearly Notes',
-    title: 'Yearly Notes',
-    color: 'rgb(254 240 138)',
-    childrens: [
-      {
-        key: 'heading-2',
-        title: 'Heading 2',
-        childrens: [
-          {
-            key: 'heading-3',
-            title: 'Heading 3',
-            childrens: [],
-          },
-        ],
-      },
-    ],
-  },
-];
+import { ISectionExplorerNode } from '@/components';
+import { useAppDispatch, useAppSelector } from '@/lib/hooks';
+import { setExplorerTrees } from '@/lib/features/notebooks/notebookSlice';
 
 export default function Notebooks({
   children,
@@ -166,17 +15,22 @@ export default function Notebooks({
   children: React.ReactNode;
 }>) {
   const router = useRouter()
-  const [pages, setPages] = useState(tableOfContent);
+  const trees = useAppSelector((state) => state.notebooks.explorerTrees);
+  const dispatch = useAppDispatch();
   const [isActionPopupOpen, setActionPopupOpen] = useState<0 | 1>(0); // 0: close | 1: create
 
-  useEffect(() => {
-    console.log("begin | it changed");
-    console.log(pages);
-    console.log("end   | it changed");
-  }, [pages]);
+  function handleSectionExplorerItemChanged(node: ISectionExplorerNode) {
+    dispatch(setExplorerTrees(trees.map((item) => item.key === node.key ? node : item)));
 
-  function handleSectionExplorerItemClick(node: ITree, event: MouseEvent<HTMLDivElement>) {
-    router.push(`/notebooks/1/pages/${node.key}`)
+    if (node.isExpanded) {
+      router.push(`/notebooks/1/pages/${node.key}`)
+    }
+  }
+
+  function handleSectionExplorerItemAction(node: ISectionExplorerNode, action: ESectionExplorerAction) {
+    if (action === ESectionExplorerAction.View) {
+      router.push(`/notebooks/1/pages/${node.key}/pages`)
+    }
   }
 
   return (
@@ -191,8 +45,9 @@ export default function Notebooks({
         </div>
         <div className={styles.explorer}>
           <SectionExplorer
-            data={pages}
-            onItemClick={handleSectionExplorerItemClick}
+            data={trees}
+            onItemChanged={handleSectionExplorerItemChanged}
+            onItemAction={handleSectionExplorerItemAction}
             actionPopup={isActionPopupOpen}
             onActionPopupChanged={(action) => setActionPopupOpen(action)}
           />

@@ -1,17 +1,19 @@
 'use client'
 
-import { useEffect, useState } from 'react';
-import { Tree, ITree } from './Tree';
+import { useEffect, useMemo, useState } from 'react';
+import { Tree } from './Tree';
 import styles from './SectionExplorer.module.scss';
 import { animated, a, useSpring } from '@react-spring/web';
+import { ESectionExplorerAction, ISectionExplorerNode, ISectionExplorerTree } from './types';
 
 // Props
 
 export interface SectionExplorerProps<T = any> extends React.HTMLAttributes<HTMLDivElement> {
-  data: ITree[];
+  data: ISectionExplorerTree[];
   actionPopup?: 0 | 1;
   onActionPopupChanged?: (action: 0 | 1) => void;
-  onItemClick?: (data: ITree<T>, event: React.MouseEvent<HTMLDivElement>) => void;
+  onItemChanged?: (node: ISectionExplorerNode<T>) => void;
+  onItemAction?: (node: ISectionExplorerNode<T>, action: ESectionExplorerAction) => void;
 }
 
 // Components
@@ -20,11 +22,12 @@ export function SectionExplorer<T = any>({
   data,
   actionPopup,
   onActionPopupChanged,
-  onItemClick,
+  onItemChanged,
+  onItemAction,
   className,
   ...props
 }: Readonly<SectionExplorerProps>) {
-  const [trees, setTrees] = useState(data);
+  const [trees, setTrees] = useState<ISectionExplorerTree[]>(data);
   const [isActionPopupOpen, setActionPopupOpen] = useState<0 | 1>(0); // 0: close | 1: create
 
   const actionPopupAnimation = useSpring({
@@ -44,10 +47,14 @@ export function SectionExplorer<T = any>({
   useEffect(() => {
     setActionPopupOpen(actionPopup || 0);
   }, [actionPopup]);
-
+  
   useEffect(() => {
     setTrees(data);
   }, [data]);
+
+  const nodes = useMemo(() => {
+    return data.filter((item) => item.parentNodeKey === null || item.parentNodeKey === undefined);
+  }, [trees]);
 
   return (
     <div className={`${styles.sectionExplorer} ${className}`} {...props}>
@@ -73,11 +80,13 @@ export function SectionExplorer<T = any>({
               </div>
             </a.div>
         </animated.div>
-        {trees.map((item) => (
+        {nodes.map((item) => (
           <Tree<T>
             key={item.key}
-            data={item}
-            onClick={onItemClick}
+            head={item}
+            data={trees}
+            onChanged={onItemChanged}
+            onAction={onItemAction}
           />
         ))}
       </div>
