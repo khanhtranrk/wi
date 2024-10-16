@@ -8,6 +8,7 @@ import { LuPlus } from 'react-icons/lu';
 import { ISectionExplorerNode } from '@/components';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { setExplorerTrees } from '@/lib/features/notebooks/notebookSlice';
+import { newWService } from 'wegs-node-sdk';
 
 export default function Notebooks({
   children,
@@ -32,6 +33,22 @@ export default function Notebooks({
       router.push(`/notebooks/1/pages/${node.key}/pages`)
     }
   }
+
+  useEffect(() => {
+    console.log('fetching notebooks');
+    let wService = newWService('http://localhost:8080');
+
+    wService.notebook.listPage(1).then((pages) => {
+      console.log(pages);
+      dispatch(setExplorerTrees(pages.map((page) => ({
+        key: page.id || '',
+        title: page.name,
+        color: page.theme,
+        parentNodeKey: page.parentId,
+        reference: page,
+    }))))});
+  }, [])
+
 
   return (
     <div className={styles.notebooks}>
