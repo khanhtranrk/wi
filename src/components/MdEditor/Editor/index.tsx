@@ -1,6 +1,6 @@
 'use client'
 
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
 import {
   headingsPlugin,
   listsPlugin,
@@ -29,9 +29,11 @@ import styles from './styles.module.scss';
 interface EditorProps {
   markdown: string;
   editorRef?: React.MutableRefObject<MDXEditorMethods | null>;
+  onChange?: (markdown: string) => void;
 }
 
-const MdEditor: FC<EditorProps> = ({ markdown, editorRef }) => {
+const MdEditor: FC<EditorProps> = ({ markdown, editorRef, onChange }) => {
+
   return (
     <MDXEditor
       className={styles.editor}
@@ -53,7 +55,7 @@ const MdEditor: FC<EditorProps> = ({ markdown, editorRef }) => {
         markdownShortcutPlugin(),
         toolbarPlugin({ toolbarContents: () => <KitchenSinkToolbar /> }),
       ]}
-      onChange={(e) => console.log(e)}
+      onChange={onChange}
       ref={editorRef}
       markdown={markdown}
     />

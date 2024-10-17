@@ -137,6 +137,18 @@ export function Tree<T = any>({
     });
   }
 
+  function handleActionPopupSaveclick() {
+    if (node.isActionPopupOpen === 1) {
+      onAction && onAction(node, ESectionExplorerAction.Add);
+      return
+    }
+
+    if (node.isActionPopupOpen === 2) {
+      onAction && onAction(node, ESectionExplorerAction.Edit);
+      return
+    }
+  }
+
   useEffect(() => {
     setTrees(data);
   }, [data]);
@@ -194,8 +206,8 @@ export function Tree<T = any>({
               <div className={styles.actionPopupContentInputs}>
                 {(node.isActionPopupOpen === 1 || node.isActionPopupOpen === 2) && (
                   <>
-                    <input type="text" value={node.isActionPopupOpen === 1 ? '' : node.title}/>
-                    <input type="color" value={node.isActionPopupOpen === 1 ? '#fde68a' : (node.color || '#000000')} />
+                    <input type="text" value={node.isActionPopupOpen === 1 ? '' : node.title} onChange={e => setNode({...node, title: e.target.value})}/>
+                    <input type="color" value={node.isActionPopupOpen === 1 ? '#fde68a' : (node.color || '#000000')} onChange={e => setNode({...node, color: e.target.value})} />
                   </>
                 )}
                 {(node.isActionPopupOpen === 3) && (
@@ -206,7 +218,7 @@ export function Tree<T = any>({
                 {(node.isActionPopupOpen === 1 || node.isActionPopupOpen === 2) && (
                   <>
                     <button onClick={handleActionPopupCancelclick}>Cancel</button>
-                    <button>Save</button>
+                    <button onClick={handleActionPopupSaveclick}>Save</button>
                   </>
                 )}
                 {(node.isActionPopupOpen === 3) && (

@@ -7,8 +7,10 @@ import styles from './styles.module.scss';
 import { LuPlus } from 'react-icons/lu';
 import { ISectionExplorerNode } from '@/components';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
-import { setExplorerTrees } from '@/lib/features/notebooks/notebookSlice';
-import { newWService } from 'wegs-node-sdk';
+import { notebooksSlice, setExplorerTrees } from '@/lib/features/notebooks/notebookSlice';
+import { newWService, NotebookPage } from 'wegs-node-sdk';
+
+const wService = newWService('http://localhost:8080');
 
 export default function Notebooks({
   children,
@@ -31,13 +33,43 @@ export default function Notebooks({
   function handleSectionExplorerItemAction(node: ISectionExplorerNode, action: ESectionExplorerAction) {
     if (action === ESectionExplorerAction.View) {
       router.push(`/notebooks/1/pages/${node.key}/pages`)
+      return
+    }
+
+    if (action === ESectionExplorerAction.Add) {
+      let page: NotebookPage = {
+        name: node.title,
+        description: node.title,
+        theme: node.color || '',
+        parentId: `${node.parentNodeKey}`,
+        content: ''
+      }
+
+      wService.notebook.createPage(1, page).then((page) => {
+        console.log("created")
+        console.log('fetching notebooks');
+        wService.notebook.listPage(1).then((pages) => {
+          console.log(pages);
+          dispatch(setExplorerTrees(pages.map((page) => ({
+            key: page.id || '',
+            title: page.name,
+            color: page.theme,
+            parentNodeKey: page.parentId,
+            reference: page,
+        }))))});
+      });
+    }
+
+    if (action === ESectionExplorerAction.Edit) {
+      wService.notebook.updatePage(1, {...node.reference, name: node.title, theme: node.color}).then(() => {
+        console.log('updated');
+      });
+      return
     }
   }
 
   useEffect(() => {
     console.log('fetching notebooks');
-    let wService = newWService('http://localhost:8080');
-
     wService.notebook.listPage(1).then((pages) => {
       console.log(pages);
       dispatch(setExplorerTrees(pages.map((page) => ({
